@@ -1,0 +1,25 @@
+{
+	"name": "vanacode/model",
+	"description": "Additions for laravel model",
+	"keywords": ["laravel", "vanacode", "model"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Davit Zeynalyan",
+			"email": "davitzeynalyan1991@gmail.com",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"laravel/framework": "10.*",
+		"vanacode/support": "*"
+	},
+	"suggest": {
+		"vanacode/helpers": "Useful functions"
+	},
+	"autoload": {
+		"psr-4": {
+			"Vanacode\\Model\\": "src/"
+		}
+	}
+}
