@@ -2,14 +2,17 @@
 
 namespace Vanacode\Model\Traits;
 
-use Vanacode\Model\Model;
-use Vanacode\Support\Exceptions\DynamicClassPropertyException;
+use Vanacode\Model\Interfaces\ModelInterface;
+use Illuminate\Database\Eloquent\Model;
 
+/**
+ * use with Vanacode\Support\Traits\DynamicClassTrait
+ */
 trait ModelPropertyTrait
 {
-    protected Model $model;
+    protected ModelInterface|Model $model;
 
-    public function setModel(Model $model): self
+    public function setModel(ModelInterface|Model $model): self
     {
         $this->model = $model;
 
@@ -17,34 +20,32 @@ trait ModelPropertyTrait
     }
 
     /**
-     * if $model argument is null based $modelClass argument or modelClass() method dynamically make model
-     * then set $model property
+     * Set model property
      *
-     * @throws DynamicClassPropertyException
+     * if $model argument is not null
+     * otherwise make model instance dynamically based caller sub folders first match and set it
      */
-    public function setModelBy(?Model $model, string $modelClass = '', array $data = []): self
+    public function setModelBy(ModelInterface|Model|null $model, array $data = []): self
     {
-        if (is_null($model)) {
-            $model = $this->makeModel($modelClass, $data);
-        }
+        $model = $model ?? $this->makeModel($data);
 
         return $model ? $this->setModel($model) : $this;
     }
 
-    public function getModel(): Model
+    public function getModel(): ModelInterface|Model
     {
         return $this->model;
     }
 
     /**
-     * if $model property is set. based $modelClass argument or modelClass() method dynamically make model
-     * then return it
+     * get model instance
      *
-     * @throws DynamicClassPropertyException
+     * return property $model if is set,
+     * otherwise make model instance dynamically based caller sub folders first match and return it
      */
-    public function getModelBy(string $modelClass, array $data = []): ?Model
+    public function getModelBy(array $data = []): ModelInterface|Model|null
     {
-        return $this->isSetModel() ? $this->getModel() : $this->makeModel($modelClass, $data);
+        return $this->isSetModel() ? $this->getModel() : $this->makeModel($data);
     }
 
     public function isSetModel(): bool
@@ -53,22 +54,10 @@ trait ModelPropertyTrait
     }
 
     /**
-     * based $modelClass argument or modelClass() method dynamically make model
-     *
-     * @throws DynamicClassPropertyException
+     * make model instance dynamically based caller sub folders first match
      */
-    public function makeModel(string $modelClass, array $data = []): ?Model
+    public function makeModel(array $data = []): ModelInterface|Model|null
     {
-        $modelClass = $modelClass ?: $this->modelClass();
-        if (! array_key_exists('nullable', $data)) {
-            $data['nullable'] = true;
-        }
-
-        return $this->makePropertyInstance('model', $modelClass, 'Models', '', $data);
-    }
-
-    public function modelClass(): string
-    {
-        return Model::class;
+        return $this->makeClassDynamically('Models', '', $data);
     }
 }
