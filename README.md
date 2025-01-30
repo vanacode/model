@@ -1,3 +1,3 @@
 @TODO
 
-composer update vanacode/model
+composer require vanacode/model
