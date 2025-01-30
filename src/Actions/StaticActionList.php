@@ -34,7 +34,7 @@ class StaticActionList extends ActionList
         return $actions;
     }
 
-    protected function getRouteDynamicParams(array &$options): array
+    protected function getRouteDynamicParams(array $options): array
     {
         return [];
     }

@@ -25,7 +25,7 @@ abstract class ActionList
 
     abstract protected function canDoAction(string $action, array $options): bool;
 
-    abstract protected function getRouteDynamicParams(array &$options): array;
+    abstract protected function getRouteDynamicParams(array $options): array;
 
     public function all(): Collection
     {
@@ -95,7 +95,7 @@ abstract class ActionList
         return $options;
     }
 
-    protected function getHrefByRoute(string $route, &$options): string
+    protected function getHrefByRoute(string $route, $options): string
     {
         $routeParams = $this->getRouteDynamicParams($options);
         $query = Arr::pull($options, 'query', []);

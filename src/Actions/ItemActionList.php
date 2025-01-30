@@ -36,7 +36,7 @@ class ItemActionList extends ActionList
         return config('vn_model.item_actions', []);
     }
 
-    protected function getRouteDynamicParams(array &$options): array
+    protected function getRouteDynamicParams(array $options): array
     {
         $itemParameters = Arr::pull($options, 'item_parameters', []);
         if (empty($itemParameters)) {
