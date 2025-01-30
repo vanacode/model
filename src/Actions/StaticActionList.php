@@ -4,9 +4,9 @@ namespace Vanacode\Model\Actions;
 
 class StaticActionList extends ActionList
 {
-    public function __construct(public readonly string $modelClass, string $resource, array $actions = [])
+    public function __construct(public readonly string $modelClass, string $resource, array $actions = [], string $subResource = '')
     {
-        parent::__construct($resource, $actions);
+        parent::__construct($resource, $actions, $subResource);
     }
 
     protected function canDoAction(string $action, array $options): bool
@@ -41,7 +41,7 @@ class StaticActionList extends ActionList
 
     protected function makeAction(string $action, array $options): StaticAction
     {
-        return new StaticAction($this->modelClass, $action, $this->resource, $options);
+        return new StaticAction($this->modelClass, $action, $this->resource, $options, $this->subResource);
     }
 
     protected function getActionOptions(): array
