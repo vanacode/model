@@ -4,7 +4,7 @@ namespace Vanacode\Model\Actions;
 
 class StaticActionList extends ActionList
 {
-    public function __construct(protected readonly string $modelClass, string $resource, array $actions = [])
+    public function __construct(public readonly string $modelClass, string $resource, array $actions = [])
     {
         parent::__construct($resource, $actions);
     }
