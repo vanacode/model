@@ -106,7 +106,7 @@ abstract class ActionList
 
     protected function isSameOrInvalidLink(array $options): bool
     {
-        $method = $options['method'] ?? 'get';
+        $method = $options['http_method'] ?? 'get';
 
         // TODO maybe later will permit same query param
         return Str::before($options['href'], '?') == URL::current() && strtolower($method) == 'get';
