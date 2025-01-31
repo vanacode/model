@@ -85,7 +85,7 @@ abstract class Action
             $parts[] = $dynamicLabel;
         }
         if ($label = Arr::pull($options, 'label', '')) {
-            $parts[] = __($label);
+            $parts[] = __($label, $this->getLocaleReplacements());
         }
 
         $parts = array_filter($parts);
@@ -100,7 +100,7 @@ abstract class Action
     {
         $title = Arr::pull($options, 'title');
 
-        return $title ? __($title) : $this->getDefaultActionLabel();
+        return $title ? __($title, $this->getLocaleReplacements()) : $this->getDefaultActionLabel();
     }
 
     protected function getDynamicLabel($options): ?string
@@ -155,7 +155,7 @@ abstract class Action
     protected function setConfirmationText(array $confirmation, string $key): array
     {
         if (! empty($confirmation[$key])) {
-            return __($confirmation[$key]);
+            return __($confirmation[$key], $this->getLocaleReplacements());
         }
         $name = VnStr::forceSnake($this->name);
         if (Lang::commonHas('confirmation.'.$name.'.'.$key)) {
