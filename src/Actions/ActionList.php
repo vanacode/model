@@ -15,7 +15,7 @@ abstract class ActionList
 
     protected Collection $processed;
 
-    public function __construct(protected string $resource, protected readonly array $actions = [], protected string $subResource = '') {}
+    public function __construct(protected string $resource, protected string $subResource = '', protected readonly array $actions = []) {}
 
     abstract protected function defaultActions(): array;
 
@@ -88,7 +88,7 @@ abstract class ActionList
             $action = Arr::pull($options, 'action_route', $action);
             $fullResource = $this->resource;
             if ($this->subResource) {
-                $fullResource .= '.' . $this->subResource;
+                $fullResource .= '.'.$this->subResource;
             }
 
             $route = ResourceRoute::resourceRoute($fullResource, $action);

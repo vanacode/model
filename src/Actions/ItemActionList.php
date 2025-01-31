@@ -7,9 +7,9 @@ use Vanacode\Model\Interfaces\ModelInterface;
 
 class ItemActionList extends ActionList
 {
-    public function __construct(protected readonly ModelInterface $item, string $resource, array $actions = [], string $subResource = '')
+    public function __construct(protected readonly ModelInterface $item, string $resource, string $subResource = '', array $actions = [])
     {
-        parent::__construct($resource, $actions, $subResource);
+        parent::__construct($resource, $subResource, $actions);
     }
 
     protected function canDoAction(string $action, array $options): bool
@@ -28,7 +28,7 @@ class ItemActionList extends ActionList
 
     protected function makeAction(string $action, array $options): ItemAction
     {
-        return new ItemAction($this->item, $action, $this->resource, $options, $this->subResource);
+        return new ItemAction($this->item, $action, $this->resource, $this->subResource, $options);
     }
 
     protected function getActionOptions(): array
