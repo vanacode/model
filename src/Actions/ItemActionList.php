@@ -55,7 +55,7 @@ class ItemActionList extends ActionList
 
     protected function getTraitActions(): array
     {
-        if ($this->item->skipTraitAction) {
+        if ($this->item->skipTraitActions()) {
             return [];
         }
 
