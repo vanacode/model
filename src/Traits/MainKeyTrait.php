@@ -2,7 +2,12 @@
 
 namespace Vanacode\Model\Traits;
 
+use Vanacode\Model\Interfaces\MainKeyInterface;
+
 // TODO later support also attribute options
+/**
+ * @mixin MainKeyInterface
+ */
 trait MainKeyTrait
 {
     protected string $mainKey;

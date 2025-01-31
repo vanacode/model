@@ -2,11 +2,12 @@
 
 namespace Vanacode\Model\Traits;
 
-use Vanacode\Model\Interfaces\ModelInterface;
 use Illuminate\Database\Eloquent\Model;
+use Vanacode\Model\Interfaces\ModelInterface;
+use Vanacode\Support\Traits\DynamicClassTrait;
 
 /**
- * use with Vanacode\Support\Traits\DynamicClassTrait
+ * @mixin DynamicClassTrait
  */
 trait ModelPropertyTrait
 {

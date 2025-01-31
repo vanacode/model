@@ -4,12 +4,18 @@ namespace Vanacode\Model\Actions;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Js;
+use Illuminate\Support\Str;
+use Vanacode\Resource\ResourceRoute;
+use Vanacode\Support\Traits\BladeTrait;
 use Vanacode\Support\VnStr;
 
 abstract class Action
 {
-    public string $name;
+    use BladeTrait;
+
+    public string $action;
 
     public string $id;
 
@@ -37,26 +43,30 @@ abstract class Action
 
     public array $style;
 
-    public function __construct(string $name, protected string $resource, protected string $subResource, protected readonly array $options)
+    public function __construct(string $name, protected string $resource, protected string $subResource, protected array $options)
     {
-        $this->name = $name;
-        $additional = $this->options;
-        $this->component = Arr::get($additional, 'component', '');
-        $this->icon = $this->makeIcon(Arr::get($additional, 'icon', ''));
-        $this->html = Arr::get($additional, 'html', '');
-        $this->target = Arr::get($additional, 'target', ''); // TODO default target
-        $this->label = $this->getLabel($additional);
-        $this->title = $this->getTitle($additional);
-        $this->isLink = Arr::get($additional, 'is_link', true);
-        $this->confirmation = $this->wrapConfirmation($additional);
-        $this->httpMethod = Arr::get($additional, 'http_method', '');
+        $this->setConfigOptions($name);
+        $this->action = $name;
+        $this->component = $this->options['component'] ?? '';
+        $this->icon = $this->makeIcon();
+        $this->html = $this->options['html'] ?? '';
+        $this->target = $this->options['target'] ?? ''; // TODO default target
+        $this->label = $this->getLabel();
+        $this->title = $this->getTitle();
+        $this->isLink = $this->options['is_link'] ?? true;
+        $this->confirmation = $this->wrapConfirmation();
+        $this->httpMethod = $this->options['http_method'] ?? '';
         if (empty($this->httpMethod) && $this->confirmation) {
             $this->httpMethod = 'DELETE';
         }
-        $this->href = $this->isLink ? Arr::get($additional, 'href') : '';
-        $this->class = $this->wrapArray(Arr::get($additional, 'class'));
-        $this->style = $this->wrapArray(Arr::get($additional, 'style'));
+        $this->href = $this->isLink ? $this->getHref() : '';
+        $this->class = $this->getArrayBy('class');
+        $this->style = $this->getArrayBy('style');
     }
+
+    abstract protected function getConfigOptions(string $name): array;
+
+    abstract protected function makeHtml(): string;
 
     public static function getDefaultConfirmationTexts(): array
     {
@@ -68,23 +78,65 @@ abstract class Action
         ];
     }
 
+    public function canShow(): bool
+    {
+        if (! $this->canDoAction()) {
+            return false;
+        }
+        if (! $this->isLink) {
+            return true;
+        }
+
+        if (! $this->href) {
+            return false;
+        }
+
+        // skip when url is same
+        $method = $this->httpMethod ?: 'get';
+
+        return Str::before($this->href, '?') != URL::current() || strtoupper($method) != request()->getMethod();
+    }
+
+    protected function canDoAction(): bool
+    {
+        return true;
+    }
+
+    public function render(): string
+    {
+        if (! $this->canShow()) {
+            return '';
+        }
+
+        return $this->makeHtml();
+    }
+
     public function jsEncodedConfirmation(): string
     {
         return Js::encode(Arr::only($this->confirmation, ['body', 'heading', 'confirm', 'close', 'btn_class']));
     }
 
-    protected function makeIcon(string $icon): string
+    protected function setConfigOptions(string $name): void
     {
+        $name = VnStr::forceSnake($name);
+        $config = $this->getConfigOptions($name);
+        $this->options = array_merge($config, $this->options);
+    }
+
+    protected function makeIcon(): string
+    {
+        $icon = $this->options['icon'] ?? '';
+
         return $icon ? sprintf('<i class="%s"></i>', $icon) : '';
     }
 
-    protected function getLabel(array $options): string
+    protected function getLabel(): string
     {
         $parts = [];
-        if ($dynamicLabel = $this->getDynamicLabel($options)) {
+        if ($dynamicLabel = $this->getDynamicLabel()) {
             $parts[] = $dynamicLabel;
         }
-        if ($label = Arr::get($options, 'label', '')) {
+        if ($label = $this->options['label'] ?? '') {
             $parts[] = __($label, $this->getLocaleReplacements());
         }
 
@@ -96,14 +148,14 @@ abstract class Action
         return $this->getActionLabel();
     }
 
-    protected function getTitle(array $options): string
+    protected function getTitle(): string
     {
-        $title = Arr::get($options, 'title');
+        $title = $this->options['title'];
 
         return $title ? __($title, $this->getLocaleReplacements()) : $this->getDefaultActionLabel();
     }
 
-    protected function getDynamicLabel($options): ?string
+    protected function getDynamicLabel(): ?string
     {
         return null;
     }
@@ -119,21 +171,21 @@ abstract class Action
         if ($this->subResource) {
             $key .= VnStr::slugToSnake($this->subResource).'.';
         }
-        $key .= VnStr::slugToSnake($this->name);
+        $key .= VnStr::slugToSnake($this->action);
 
         return Lang::actionResource($this->resource, $key);
     }
 
-    protected function wrapConfirmation(array $options): array
+    protected function wrapConfirmation(): array
     {
-        $confirmation = Arr::get($options, 'confirmation', []);
+        $confirmation = $this->options['confirmation'] ?? false;
         if (empty($confirmation)) {
             return $confirmation;
         }
         $confirmation = is_bool($confirmation) ? [] : $confirmation;
         $confirmation['modal'] = $confirmation['modal'] ?? 'confirmation-modal';
 
-        $name = VnStr::forceSnake($this->name);
+        $name = VnStr::forceSnake($this->action);
         $hasCustomBody = Lang::commonHas('confirmation.'.$name.'.body');
         $bodyKey = $hasCustomBody ? 'confirmation.'.$name.'.body' : 'confirmation.default.body';
         $bodyKey = $confirmation['body'] ?? $bodyKey;
@@ -157,7 +209,7 @@ abstract class Action
         if (! empty($confirmation[$key])) {
             return __($confirmation[$key], $this->getLocaleReplacements());
         }
-        $name = VnStr::forceSnake($this->name);
+        $name = VnStr::forceSnake($this->action);
         if (Lang::commonHas('confirmation.'.$name.'.'.$key)) {
             $confirmation[$key] = Lang::common('confirmation.'.$name.'.'.$key);
         }
@@ -165,8 +217,47 @@ abstract class Action
         return $confirmation;
     }
 
-    protected function wrapArray(array|string|null $value): array
+    protected function getHref(): string
     {
+        if (! empty($this->options['href'])) {
+            return $this->options['href'];
+        }
+        if (! empty($this->options['uri'])) {
+            return url($this->options['uri']);
+        }
+        if (! empty($this->options['route'])) {
+            $route = $this->options['route'];
+        } else {
+            $action = $this->options['action_route'] ?? $this->action;
+            $fullResource = $this->resource;
+            if ($this->subResource) {
+                $fullResource .= '.'.$this->subResource;
+            }
+
+            $route = ResourceRoute::resourceRoute($fullResource, $action);
+        }
+
+        return $route ? $this->getHrefByRoute($route) : '';
+    }
+
+    protected function getHrefByRoute(string $route): string
+    {
+        $routeParams = $this->getRouteDynamicParams();
+        $query = $this->options['query'] ?? [];
+        $routeParams = array_merge($routeParams, $query);
+
+        return ResourceRoute::routeUrl($route, $routeParams);
+    }
+
+    protected function getRouteDynamicParams(): array
+    {
+        return [];
+    }
+
+    protected function getArrayBy(string $key): array
+    {
+        $value = $this->options[$key] ?? '';
+
         return Arr::wrap($value);
     }
 }

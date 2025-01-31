@@ -2,16 +2,17 @@
 
 namespace Vanacode\Model\Actions;
 
+use Vanacode\Model\Interfaces\ActionInterface;
+
 class StaticActionList extends ActionList
 {
+
+    /**
+     * @param class-string<ActionInterface> $modelClass
+     */
     public function __construct(public readonly string $modelClass, string $resource, string $subResource = '', array $actions = [])
     {
         parent::__construct($resource, $subResource, $actions);
-    }
-
-    protected function canDoAction(string $action, array $options): bool
-    {
-        return true;
     }
 
     protected function defaultActions(): array
@@ -23,6 +24,11 @@ class StaticActionList extends ActionList
         return $this->mergeActions($allActions);
     }
 
+    protected function makeAction(string $action, array $options): StaticAction
+    {
+        return new StaticAction($this->modelClass, $action, $this->resource, $this->subResource, $options);
+    }
+
     protected function getTraitActions(): array
     {
         $methods = (new $this->modelClass)->getMethodsMatch('getStaticActionsBy');
@@ -32,20 +38,5 @@ class StaticActionList extends ActionList
         }
 
         return $actions;
-    }
-
-    protected function getRouteDynamicParams(array $options): array
-    {
-        return [];
-    }
-
-    protected function makeAction(string $action, array $options): StaticAction
-    {
-        return new StaticAction($this->modelClass, $action, $this->resource, $this->subResource, $options);
-    }
-
-    protected function getActionOptions(): array
-    {
-        return config('vn_model.static_actions', []);
     }
 }

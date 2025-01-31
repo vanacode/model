@@ -17,14 +17,14 @@ trait BooleanAttributeTrait
             }
 
             $attributeDetails[$attribute] = [
-                'method' => 'getBooleanLabel',
+                'method' => 'booleanLabel',
             ];
         }
 
         return $attributeDetails;
     }
 
-    public function getBooleanLabel($attribute): ?string
+    public function booleanLabel($attribute): ?string
     {
         return Lang::boolean($this->$attribute);
     }
