@@ -117,9 +117,9 @@ abstract class Action
     {
         $key = '';
         if ($this->subResource) {
-            $key .= $this->subResource.'.';
+            $key .= VnStr::slugToSnake($this->subResource).'.';
         }
-        $key .= VnStr::snakeSlug($this->name);
+        $key .= VnStr::slugToSnake($this->name);
 
         return Lang::actionResource($this->resource, $key);
     }
