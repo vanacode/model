@@ -41,21 +41,21 @@ abstract class Action
     {
         $this->name = $name;
         $additional = $this->options;
-        $this->component = Arr::pull($additional, 'component', '');
-        $this->icon = $this->makeIcon(Arr::pull($additional, 'icon', ''));
-        $this->html = Arr::pull($additional, 'html', '');
-        $this->target = Arr::pull($additional, 'target', ''); // TODO default target
+        $this->component = Arr::get($additional, 'component', '');
+        $this->icon = $this->makeIcon(Arr::get($additional, 'icon', ''));
+        $this->html = Arr::get($additional, 'html', '');
+        $this->target = Arr::get($additional, 'target', ''); // TODO default target
         $this->label = $this->getLabel($additional);
         $this->title = $this->getTitle($additional);
-        $this->isLink = Arr::pull($additional, 'is_link', true);
+        $this->isLink = Arr::get($additional, 'is_link', true);
         $this->confirmation = $this->wrapConfirmation($additional);
-        $this->httpMethod = Arr::pull($additional, 'http_method', '');
+        $this->httpMethod = Arr::get($additional, 'http_method', '');
         if (empty($this->httpMethod) && $this->confirmation) {
             $this->httpMethod = 'DELETE';
         }
-        $this->href = $this->isLink ? Arr::pull($additional, 'href') : '';
-        $this->class = $this->wrapArray(Arr::pull($additional, 'class'));
-        $this->style = $this->wrapArray(Arr::pull($additional, 'style'));
+        $this->href = $this->isLink ? Arr::get($additional, 'href') : '';
+        $this->class = $this->wrapArray(Arr::get($additional, 'class'));
+        $this->style = $this->wrapArray(Arr::get($additional, 'style'));
     }
 
     public static function getDefaultConfirmationTexts(): array
@@ -84,7 +84,7 @@ abstract class Action
         if ($dynamicLabel = $this->getDynamicLabel($options)) {
             $parts[] = $dynamicLabel;
         }
-        if ($label = Arr::pull($options, 'label', '')) {
+        if ($label = Arr::get($options, 'label', '')) {
             $parts[] = __($label, $this->getLocaleReplacements());
         }
 
@@ -98,7 +98,7 @@ abstract class Action
 
     protected function getTitle(array $options): string
     {
-        $title = Arr::pull($options, 'title');
+        $title = Arr::get($options, 'title');
 
         return $title ? __($title, $this->getLocaleReplacements()) : $this->getDefaultActionLabel();
     }
@@ -126,7 +126,7 @@ abstract class Action
 
     protected function wrapConfirmation(array $options): array
     {
-        $confirmation = Arr::pull($options, 'confirmation', []);
+        $confirmation = Arr::get($options, 'confirmation', []);
         if (empty($confirmation)) {
             return $confirmation;
         }

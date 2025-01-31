@@ -38,7 +38,7 @@ class ItemActionList extends ActionList
 
     protected function getRouteDynamicParams(array $options): array
     {
-        $itemParameters = Arr::pull($options, 'item_parameters', []);
+        $itemParameters = Arr::get($options, 'item_parameters', []);
         if (empty($itemParameters)) {
             return [$this->item->getRouteKey()];
         }

@@ -23,7 +23,7 @@ class ItemAction extends Action
 
     protected function getDynamicLabel($options): ?string
     {
-        $attribute = Arr::pull($options, 'attribute_label', '');
+        $attribute = Arr::get($options, 'attribute_label', '');
 
         return $attribute ? $this->item->$attribute : null;
     }

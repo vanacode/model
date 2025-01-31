@@ -78,14 +78,14 @@ abstract class ActionList
             return $options;
         }
         if (! empty($options['uri'])) {
-            $options['href'] = url(Arr::pull($options, 'uri'));
+            $options['href'] = url(Arr::get($options, 'uri'));
 
             return $options;
         }
         if (! empty($options['route'])) {
-            $route = Arr::pull($options, 'route');
+            $route = Arr::get($options, 'route');
         } else {
-            $action = Arr::pull($options, 'action_route', $action);
+            $action = Arr::get($options, 'action_route', $action);
             $fullResource = $this->resource;
             if ($this->subResource) {
                 $fullResource .= '.'.$this->subResource;
@@ -103,7 +103,7 @@ abstract class ActionList
     protected function getHrefByRoute(string $route, $options): string
     {
         $routeParams = $this->getRouteDynamicParams($options);
-        $query = Arr::pull($options, 'query', []);
+        $query = Arr::get($options, 'query', []);
         $routeParams = array_merge($routeParams, $query);
 
         return ResourceRoute::routeUrl($route, $routeParams);
