@@ -150,7 +150,7 @@ abstract class Action
 
     protected function getTitle(): string
     {
-        $title = $this->options['title'];
+        $title = $this->options['title'] ?? '';
 
         return $title ? __($title, $this->getLocaleReplacements()) : $this->getDefaultActionLabel();
     }
@@ -180,7 +180,7 @@ abstract class Action
     {
         $confirmation = $this->options['confirmation'] ?? false;
         if (empty($confirmation)) {
-            return $confirmation;
+            return [];
         }
         $confirmation = is_bool($confirmation) ? [] : $confirmation;
         $confirmation['modal'] = $confirmation['modal'] ?? 'confirmation-modal';
