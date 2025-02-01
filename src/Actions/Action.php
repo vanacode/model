@@ -42,7 +42,7 @@ abstract class Action
 
     public array $style;
 
-    public function __construct(public string $action, protected string $resource, protected string $subResource, protected array $options)
+    public function __construct(public string $action, protected string $resource, protected string $subResource, public array $options)
     {
         $this->setConfigOptions();
         $this->component = $this->options['component'] ?? '';

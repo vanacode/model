@@ -11,9 +11,14 @@ trait PaginateableTrait
      */
     protected array $paginateable = [];
 
+    /**
+     * values like paginateable
+     */
+    protected array $routePaginateable = [];
+
     public function getPaginateAble(): array
     {
-        return $this->paginateable;
+        return $this->getRouteScopedOptions($this->routePaginateable, $this->paginateable);
     }
 
     public function getPaginateableAttributes(): AttributeList
