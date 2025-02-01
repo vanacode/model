@@ -15,7 +15,6 @@ abstract class Action
 {
     use BladeTrait;
 
-    public string $action;
 
     public string $id;
 
@@ -43,10 +42,9 @@ abstract class Action
 
     public array $style;
 
-    public function __construct(string $name, protected string $resource, protected string $subResource, protected array $options)
+    public function __construct(public string $action, protected string $resource, protected string $subResource, protected array $options)
     {
-        $this->setConfigOptions($name);
-        $this->action = $name;
+        $this->setConfigOptions();
         $this->component = $this->options['component'] ?? '';
         $this->icon = $this->makeIcon();
         $this->html = $this->options['html'] ?? '';
@@ -64,7 +62,7 @@ abstract class Action
         $this->style = $this->getArrayBy('style');
     }
 
-    abstract protected function getConfigOptions(string $name): array;
+    abstract protected function getConfigOptions(string $action): array;
 
     abstract protected function makeHtml(): string;
 
@@ -116,10 +114,10 @@ abstract class Action
         return Js::encode(Arr::only($this->confirmation, ['body', 'heading', 'confirm', 'close', 'btn_class']));
     }
 
-    protected function setConfigOptions(string $name): void
+    protected function setConfigOptions(): void
     {
-        $name = VnStr::forceSnake($name);
-        $config = $this->getConfigOptions($name);
+        $key = VnStr::forceSnake($this->action);
+        $config = $this->getConfigOptions($key);
         $this->options = array_merge($config, $this->options);
     }
 
@@ -185,9 +183,9 @@ abstract class Action
         $confirmation = is_bool($confirmation) ? [] : $confirmation;
         $confirmation['modal'] = $confirmation['modal'] ?? 'confirmation-modal';
 
-        $name = VnStr::forceSnake($this->action);
-        $hasCustomBody = Lang::commonHas('confirmation.'.$name.'.body');
-        $bodyKey = $hasCustomBody ? 'confirmation.'.$name.'.body' : 'confirmation.default.body';
+        $action = VnStr::forceSnake($this->action);
+        $hasCustomBody = Lang::commonHas('confirmation.'.$action.'.body');
+        $bodyKey = $hasCustomBody ? 'confirmation.'.$action.'.body' : 'confirmation.default.body';
         $bodyKey = $confirmation['body'] ?? $bodyKey;
 
         $confirmation['body'] = Lang::common($bodyKey, $this->getLocaleReplacements());
@@ -209,9 +207,9 @@ abstract class Action
         if (! empty($confirmation[$key])) {
             return __($confirmation[$key], $this->getLocaleReplacements());
         }
-        $name = VnStr::forceSnake($this->action);
-        if (Lang::commonHas('confirmation.'.$name.'.'.$key)) {
-            $confirmation[$key] = Lang::common('confirmation.'.$name.'.'.$key);
+        $action = VnStr::forceSnake($this->action);
+        if (Lang::commonHas('confirmation.'.$action.'.'.$key)) {
+            $confirmation[$key] = Lang::common('confirmation.'.$action.'.'.$key);
         }
 
         return $confirmation;

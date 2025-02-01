@@ -8,14 +8,14 @@ use Vanacode\Model\Interfaces\ActionInterface;
 
 class ItemAction extends Action
 {
-    public function __construct(protected readonly ActionInterface $item, string $name, string $resource, string $subResource, array $options)
+    public function __construct(protected readonly ActionInterface $item, string $action, string $resource, string $subResource, array $options)
     {
-        parent::__construct($name, $resource, $subResource, $options);
+        parent::__construct($action, $resource, $subResource, $options);
     }
 
-    protected function getConfigOptions(string $name): array
+    protected function getConfigOptions(string $action): array
     {
-        return config('vn_model.item_actions.'.$name, []);
+        return config('vn_model.item_actions.'.$action, []);
     }
 
     protected function canDoAction(): bool

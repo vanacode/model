@@ -4,17 +4,17 @@ namespace Vanacode\Model\Actions;
 
 class StaticAction extends Action
 {
-    public function __construct(public readonly string $modelClass, string $name, string $resource, string $subResource, array $options)
+    public function __construct(public readonly string $modelClass, string $action, string $resource, string $subResource, array $options)
     {
-        parent::__construct($name, $resource, $subResource, $options);
+        parent::__construct($action, $resource, $subResource, $options);
         if (empty($this->icon)) {
-            throw new \Exception($name.' Static action icon is required.');
+            throw new \Exception($action.' Static action icon is required.');
         }
     }
 
-    protected function getConfigOptions($name): array
+    protected function getConfigOptions(string $action): array
     {
-        return config('vn_model.static_actions.'.$name, []);
+        return config('vn_model.static_actions.'.$action, []);
     }
 
     protected function makeHtml(): string
