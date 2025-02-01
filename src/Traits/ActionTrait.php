@@ -21,6 +21,7 @@ trait ActionTrait
         'edit',
         'destroy',
     ];
+    protected array $routeActions = [];
 
     protected static array $staticActions = [
         'index',
@@ -40,7 +41,7 @@ trait ActionTrait
 
     public function getActions(): array
     {
-        return $this->actions;
+        return $this->getRouteScopedOptions($this->routeActions, $this->actions);
     }
 
     public function getActionOptions(string $resource, string $subResource = '', array $actions = []): ItemActionList

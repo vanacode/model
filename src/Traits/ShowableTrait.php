@@ -10,10 +10,11 @@ trait ShowableTrait
      * see Attribute __construct
      */
     protected array $showable = [];
+    protected array $routeShowable = [];
 
     public function getShowable(): array
     {
-        return $this->showable;
+        return $this->getRouteScopedOptions($this->routeShowable, $this->showable);
     }
 
     public function getShowableOptions(): AttributeList
