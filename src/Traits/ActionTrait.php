@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Vanacode\Model\Actions\ItemAction;
 use Vanacode\Model\Actions\ItemActionList;
 use Vanacode\Model\Interfaces\ActionInterface;
+use Vanacode\Resource\ResourceRoute;
 use Vanacode\Support\VnStr;
 
 /**
@@ -79,15 +80,27 @@ trait ActionTrait
     {
         $value = $this->getMainKey();
 
-        return $this->getLinkByAction($value);
+        return $this->getSelfLinkByValue($value);
     }
 
     public function getSelfLinkBy(string $attribute): string
     {
         $value = $this->$attribute;
 
-        return $this->getLinkByAction($value);
+        return $this->getSelfLinkByValue($value);
     }
+
+    public function getSelfLinkByValue(string $value): string
+    {
+        if (! $this->canDoShowAction()) {
+            return $value;
+        }
+        $url = ResourceRoute::resourceUrl($this->getResource(), 'show', $this->getRouteKey());
+
+
+        return $this->renderLink($url, $value);
+    }
+
 
     public function getDeletedSelfLinkAttribute(): string
     {
