@@ -254,7 +254,7 @@ abstract class Action
 
     protected function getArrayBy(string $key): array
     {
-        $value = $this->options[$key] ?? '';
+        $value = $this->options[$key] ?? null;
 
         return Arr::wrap($value);
     }
