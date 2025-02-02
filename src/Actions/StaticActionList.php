@@ -6,9 +6,8 @@ use Vanacode\Model\Interfaces\ActionInterface;
 
 class StaticActionList extends ActionList
 {
-
     /**
-     * @param class-string<ActionInterface> $modelClass
+     * @param  class-string<ActionInterface>  $modelClass
      */
     public function __construct(public readonly string $modelClass, string $resource, string $subResource = '', array $actions = [])
     {

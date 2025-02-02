@@ -55,7 +55,7 @@ class ItemAction extends Action
         return $attribute ? $this->item->$attribute : null;
     }
 
-    protected function getActionLabel(): string
+    protected function detectActionLabel(): string
     {
         return $this->icon ? '' : $this->getDefaultActionLabel();
     }

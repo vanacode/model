@@ -10,5 +10,16 @@ interface MainKeyInterface
 
     public function getMainKeyWithId(): string;
 
-    public function getMainKeyTraitAttributeOptions();
+    /**
+     * Called dynamically by Attributes
+     */
+    public function getMainKeyTraitAttributeOptions(): array;
+
+    public function getSelfLinkAttribute(): string;
+
+    public function getSelfLinkBy(string $attribute): string;
+
+    public function getDeletedSelfLinkAttribute(): string;
+
+    public function getLinkByValue(string $value, string $action = 'show', array $options = []): string;
 }

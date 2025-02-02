@@ -4,6 +4,7 @@ namespace Vanacode\Model\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
 use Vanacode\Model\Actions\ItemActionList;
+use Vanacode\Support\Interfaces\MethodMatchInterface;
 
 /**
  * @mixin MethodMatchInterface
@@ -29,12 +30,6 @@ interface ActionInterface
     public function canDoDestroyAction(): bool;
 
     public function canDoRestoreAction(): bool;
-
-    public function getSelfLinkAttribute(): string;
-
-    public function getSelfLinkBy(string $attribute): string;
-
-    public function getDeletedSelfLinkAttribute(): string;
 
     public function renderAction(string $action, array $options = []): string;
 

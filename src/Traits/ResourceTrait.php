@@ -3,7 +3,11 @@
 namespace Vanacode\Model\Traits;
 
 use Illuminate\Support\Str;
+use Vanacode\Model\Interfaces\ResourceInterface;
 
+/**
+ * @mixin ResourceInterface
+ */
 trait ResourceTrait
 {
     protected static array $resources = [];

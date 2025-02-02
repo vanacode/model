@@ -5,25 +5,22 @@ namespace Vanacode\Model\Attributes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Str;
+use Vanacode\Model\Interfaces\ModelInterface;
 use Vanacode\Model\Model;
 use Vanacode\Resource\RequestHelper;
 
 /**
- * @var array
- *            possible keys
- *            [
- *            virtual, set true for not existing column
- *            column,     (autodetect, no need to set it will be removed when virtual=true)
- *            attribute,  (autodetect, need to set when attribute is not same like column, it will be removed when virtual=true
- *            label,      (table heading auto-detected)
- *            hide,    (when it true then will not show in table)
- *            html,    use {!! !!}
- *            with_count, used for automatically get relation count
- *            with TODO
- *            order_by TODO
- *            relation,   used for automatically insert in query this as well
- *            searchable,     set it false for not do search
- *            ]
+ *  virtual, set true for not existing column
+ *  column,     (autodetect, no need to set it will be removed when virtual=true)
+ *  attribute,  (autodetect, need to set when attribute is not same like column, it will be removed when virtual=true
+ *  label,      (table heading auto-detected)
+ *  hide,    (when it true then will not show in table)
+ *  html,    use {!! !!}
+ *  with_count, used for automatically get relation count
+ *  with TODO
+ *  order_by TODO
+ *  relation,   used for automatically insert in query this as well
+ *  searchable,     set it false for not do search
  */
 class Attribute
 {
@@ -79,16 +76,16 @@ class Attribute
 
     public array $actions;
 
-    public function __construct(protected Model $model, string $name, protected string $resource, public array $options)
+    public function __construct(protected ModelInterface $item, string $name, protected string $resource, public array $options)
     {
         $this->name = $name;
-         $this->validate();
+        $this->validate();
 
         $this->virtual = (bool) ($this->options['virtual'] ?? false);
         $this->orderable = (bool) ($this->options['orderable'] ?? ! $this->virtual);
         $this->searchable = (bool) ($this->options['searchable'] ?? ! $this->virtual);
         $this->hide = (bool) ($this->options['hide'] ?? false);
-        $this->html = (bool) ($this->options['html'] ??  false);
+        $this->html = (bool) ($this->options['html'] ?? false);
 
         $this->attribute = $this->options['attribute'] ?? $this->name;
         $this->label = $this->options['label'];
@@ -161,15 +158,22 @@ class Attribute
 
     protected function getAttributeLabel(array $details): string
     {
-        return ! empty($details['label']) ? __($details['label']) : Lang::attribute($this->name, $this->resource);
+        if (!empty($details['label'])) {
+            return $details['label'];
+        }
+        return ! empty($details['label_key']) ? __($details['label_key']) : Lang::attribute($this->name, $this->resource);
     }
 
     protected function getWithCountAttributeLabel(array $details): string
     {
+        if (!empty($details['label'])) {
+            return $details['label'];
+        }
+
         $resource = $details['with_count'] ?? $this->name;
 
-        return ! empty($details['label'])
-            ? __($details['label'], ['resource' => $resource])
+        return ! empty($details['label_key'])
+            ? __($details['label_key'], ['resource' => $resource])
             : Lang::commonResource($resource, 'resource.with_count');
     }
 
@@ -182,11 +186,12 @@ class Attribute
         $value = $data[$this->searchAttribute->name]
             ?? $data[RequestHelper::queryAlias('search')]
             ?? [];
+
         return self::searchLikeArray($value);
 
     }
 
-    public static function searchLikeArray($search, bool $filter = true):array
+    public static function searchLikeArray($search, bool $filter = true): array
     {
         $array = is_string($search) ? explode('|', $search) : Arr::wrap($search);
         if ($filter) {

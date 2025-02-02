@@ -3,6 +3,7 @@
 namespace Vanacode\Model\Traits;
 
 use Vanacode\Model\Interfaces\MainKeyInterface;
+use Vanacode\Resource\ResourceRoute;
 
 // TODO later support also attribute options
 /**
@@ -30,7 +31,7 @@ trait MainKeyTrait
     /**
      * Called dynamically by Attributes
      */
-    public function getMainKeyTraitAttributeOptions()
+    public function getMainKeyTraitAttributeOptions(): array
     {
         $mainKey = $this->getMainKeyName();
 
@@ -39,5 +40,42 @@ trait MainKeyTrait
                 'method' => 'getMainKey',
             ],
         ];
+    }
+
+    public function getSelfLinkAttribute(): string
+    {
+        $value = $this->getMainKey();
+
+        return $this->getLinkByValue($value);
+    }
+
+    public function getSelfLinkBy(string $attribute): string
+    {
+        $value = $this->$attribute;
+
+        return $this->getLinkByValue($value);
+    }
+
+    public function getDeletedSelfLinkAttribute(): string
+    {
+        $mainKey = $this->getMainKey();
+        if (! $this->exists) {
+            return '<span class="text-danger">'.$mainKey.'</span>';
+        }
+
+        $link = $this->getLinkByValue($this->getMainKey(), 'show-deleted', ['class' => 'text-warning']);
+        $link = $mainKey == $link ? '<span class="text-warning">'.$link.'</span>' : $link;
+
+        return $this->renderAction('restore').$link;
+    }
+
+    public function getLinkByValue(string $value, string $action = 'show', array $options = []): string
+    {
+        if (! $this->canDoAction($action)) {
+            return $value;
+        }
+        $url = ResourceRoute::resourceUrl($this->getResource(), $action, $this->getRouteKey());
+
+        return $this->renderLink($url, $value, $options);
     }
 }

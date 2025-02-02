@@ -2,7 +2,10 @@
 
 namespace Vanacode\Model\Interfaces;
 
+use Illuminate\Database\Eloquent\Model;
+use Vanacode\Support\Interfaces\MethodMatchInterface;
+
 /**
- * @extends ActionInterface;
+ * @mixin Model
  */
-interface ModelInterface {}
+interface ModelInterface extends ActionInterface, AttributeInterface, MainKeyInterface, MethodMatchInterface, PaginateableInterface, RelationshipsInterface, ResourceInterface, ShowableInterface {}

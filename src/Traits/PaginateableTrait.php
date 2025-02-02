@@ -3,7 +3,11 @@
 namespace Vanacode\Model\Traits;
 
 use Vanacode\Model\Attributes\AttributeList;
+use Vanacode\Model\Interfaces\PaginateableInterface;
 
+/**
+ * @mixin PaginateableInterface
+ */
 trait PaginateableTrait
 {
     /**

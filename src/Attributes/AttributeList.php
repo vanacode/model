@@ -3,7 +3,7 @@
 namespace Vanacode\Model\Attributes;
 
 use Illuminate\Support\Collection;
-use Vanacode\Model\Model;
+use Vanacode\Model\Interfaces\ModelInterface;
 use Vanacode\Support\Traits\CheckAccess;
 
 class AttributeList
@@ -12,7 +12,7 @@ class AttributeList
 
     protected collection $processed;
 
-    public function __construct(protected readonly Model $item, protected string $resource, protected readonly array $attributes = [])
+    public function __construct(protected readonly ModelInterface $item, protected string $resource, protected readonly array $attributes = [])
     {
         // TODO resource
         // TODO save search template, columns template ,...etc

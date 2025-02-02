@@ -6,7 +6,6 @@ use Illuminate\Support\Str;
 use Vanacode\Model\Actions\ItemAction;
 use Vanacode\Model\Actions\ItemActionList;
 use Vanacode\Model\Interfaces\ActionInterface;
-use Vanacode\Resource\ResourceRoute;
 use Vanacode\Support\VnStr;
 
 /**
@@ -21,6 +20,7 @@ trait ActionTrait
         'edit',
         'destroy',
     ];
+
     protected array $routeActions = [];
 
     protected static array $staticActions = [
@@ -75,45 +75,6 @@ trait ActionTrait
     public function canDoRestoreAction(): bool
     {
         return true;
-    }
-
-    public function getSelfLinkAttribute(): string
-    {
-        $value = $this->getMainKey();
-
-        return $this->getSelfLinkByValue($value);
-    }
-
-    public function getSelfLinkBy(string $attribute): string
-    {
-        $value = $this->$attribute;
-
-        return $this->getSelfLinkByValue($value);
-    }
-
-    public function getSelfLinkByValue(string $value): string
-    {
-        if (! $this->canDoShowAction()) {
-            return $value;
-        }
-        $url = ResourceRoute::resourceUrl($this->getResource(), 'show', $this->getRouteKey());
-
-
-        return $this->renderLink($url, $value);
-    }
-
-
-    public function getDeletedSelfLinkAttribute(): string
-    {
-        $mainKey = $this->getMainKey();
-        if (! $this->exists) {
-            return '<span class="text-danger">'.$mainKey.'</span>';
-        }
-
-        $link = $this->getLinkByAction($this->getMainKey(), 'show-deleted', ['class' => 'text-warning']);
-        $link = $mainKey == $link ? '<span class="text-warning">'.$link.'</span>' : $link;
-
-        return $this->renderAction('restore').$link;
     }
 
     public function renderAction(string $action, array $options = []): string

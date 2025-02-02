@@ -3,13 +3,18 @@
 namespace Vanacode\Model\Traits;
 
 use Vanacode\Model\Attributes\AttributeList;
+use Vanacode\Model\Interfaces\ShowableInterface;
 
+/**
+ * @mixin ShowableInterface
+ */
 trait ShowableTrait
 {
     /**
      * see Attribute __construct
      */
     protected array $showable = [];
+
     protected array $routeShowable = [];
 
     public function getShowable(): array

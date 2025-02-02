@@ -46,7 +46,7 @@ class SearchAttribute
         $this->name = $options['name'] ?? $attribute->name;
         $this->composer = $options['composer'] ?? null;
         if ($this->composer) {
-            $options['options_variable'] = $options['options_variable'] ?? Str::camel(Str::plural(str_replace('_id', '', $this->name)));// TODO _id by config
+            $options['options_variable'] = $options['options_variable'] ?? Str::camel(Str::plural(str_replace('_id', '', $this->name))); // TODO _id by config
             $options['input_method'] = $options['input_method'] ?? self::INPUT_METHOD_SELECT;
             $options['multiple'] = $options['multiple'] ?? true;
             $options['operation'] = $options['operation'] ?? ($options['multiple'] ? self::OPERATION_WHERE_IN : self::OPERATION_LIKE);

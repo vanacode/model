@@ -3,7 +3,6 @@
 namespace Vanacode\Model\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Vanacode\Model\Attributes\Attribute;
 use Vanacode\Model\Attributes\AttributeList;
@@ -39,7 +38,7 @@ trait AttributeTrait
             Attribute::ACTIONS => [
                 'virtual' => true,
                 'component' => 'actions.item',
-                'label' => 'common.actions',
+                'label_key' => 'common.actions',
                 //                'actions' => [], set by default $actions property,
             ],
             $this->getCreatedAtColumn() => [
@@ -77,14 +76,18 @@ trait AttributeTrait
         return $this->only($this->getFillableWithId());
     }
 
-    public function scopeCallback(Builder $q, ?callable $callback = null): Builder
+    public function scopeCallback(Builder $q, ?callable $callback = null): void
     {
-        return $q->when(is_callable($callback), function ($q) use ($callback) {
+        $q->when(is_callable($callback), function ($q) use ($callback) {
             $callback($q);
         });
     }
 
-    public function scopeAttributeOptions(Builder $q, AttributeList $attributes, array $data = []): Builder
+    /**
+     * @param Builder<static> $q
+     * @throws \Exception
+     */
+    public function scopeAttributeOptions(Builder $q, AttributeList $attributes, array $data = []): void
     {
         $select = $attributes->getSelectable();
         if (! $select->contains($this->getKeyName())) {
@@ -99,7 +102,7 @@ trait AttributeTrait
         $with = $attributes->getWith();
         $search = Attribute::searchLikeArray($search);
 
-        return $q->select($this->qualifyColumns($select->all())) // TODO option for skip qualify columns
+        $q->select($this->qualifyColumns($select->all())) // TODO option for skip qualify columns
             ->simpleSearchByAttributes($attributes, $search)
             ->advancedSearchByAttributes($attributes, $data, $advancedSearch)
             ->when($withCount, function ($query) use ($withCount) {
@@ -143,6 +146,9 @@ trait AttributeTrait
             });
     }
 
+    /**
+     * @param Builder<static> $q
+     */
     public function scopeSimpleSearchByAttributes(Builder $q, AttributeList $attributes, array $search): void
     {
         if (empty($search)) {
@@ -152,19 +158,19 @@ trait AttributeTrait
         $searchable = $attributes->getSearchable();
         $searchSelfRelationColumns = $attributes->getSearchSelfRelationColumns();
         if (! $searchSelfRelationColumns) {
-            $this->simpleSearchByAllAttributes($q, $searchable, $search);
+            $q->simpleSearchByAllAttributes($searchable, $search);
 
             return;
         }
 
         $q->where(function ($q) use ($searchable, $search, $searchSelfRelationColumns) {
-            $this->simpleSearchByAllAttributes($q, $searchable, $search);
+            $q->simpleSearchByAllAttributes($searchable, $search);
             foreach ($searchSelfRelationColumns as $relation => $columns) {
                 $q->orWhereHas($relation, function ($q) use ($searchable, $search, $columns) {
                     $q->where(function ($q) use ($searchable, $search, $columns) {
                         foreach ($searchable as $attribute) {
                             if ($columns === true || in_array($attribute->searchAttribute->name, $columns)) {
-                                $this->searchByAttribute($q, $attribute, $search);
+                                $q->searchByAttribute($attribute, $search);
                             }
                         }
                     });
@@ -173,6 +179,9 @@ trait AttributeTrait
         });
     }
 
+    /**
+     * @param Builder<static> $q
+     */
     public function scopeAdvancedSearchByAttributes(Builder $q, AttributeList $attributes, array $data, bool $advancedSearch): void
     {
         if (empty($advancedSearch)) {
@@ -183,13 +192,13 @@ trait AttributeTrait
         $searchAttributes = $attributes->getSearchAttributes();
 
         if (! $searchSelfRelationColumns) {
-            $this->advancedSearchByAllAttributes($q, $searchAttributes, $data);
+            $q->advancedSearchByAllAttributes($searchAttributes, $data);
 
             return;
         }
 
         $q->where(function ($q) use ($searchAttributes, $data, $searchSelfRelationColumns) {
-            $this->advancedSearchByAllAttributes($q, $searchAttributes, $data);
+            $q->advancedSearchByAllAttributes($searchAttributes, $data);
             foreach ($searchSelfRelationColumns as $relation => $columns) {
                 $q->orWhereHas($relation, function ($q) use ($searchAttributes, $data, $columns) {
                     $strictSearch = $data[RequestHelper::queryAlias('strict_search')] ?? true;
@@ -201,7 +210,7 @@ trait AttributeTrait
                         /** @var Attribute $attribute */
                         $search = $attribute->getSearchValue($data);
                         if ($search) {
-                            $this->searchByAttribute($q, $attribute, $search, $strictSearch);
+                            $q->searchByAttribute($attribute, $search, $strictSearch);
                         }
                     }
                 });
@@ -209,16 +218,22 @@ trait AttributeTrait
         });
     }
 
-    protected function simpleSearchByAllAttributes(Builder $q, Collection $searchable, array $search)
+    /**
+     * @param Builder<static> $q
+     */
+    public function scopeSimpleSearchByAllAttributes(Builder $q, Collection $searchable, array $search): void
     {
         $q->where(function ($q) use ($searchable, $search) {
             foreach ($searchable as $attribute) {
-                $this->searchByAttribute($q, $attribute, $search);
+                $q->searchByAttribute($attribute, $search);
             }
         });
     }
 
-    protected function advancedSearchByAllAttributes(Builder $q, Collection $searchAttributes, array $data)
+    /**
+     * @param Builder<static> $q
+     */
+    public function scopeAdvancedSearchByAllAttributes(Builder $q, Collection $searchAttributes, array $data): void
     {
         $q->where(function ($q) use ($data, $searchAttributes) {
             $strictSearch = $data[RequestHelper::queryAlias('strict_search')] ?? true;
@@ -226,13 +241,16 @@ trait AttributeTrait
                 /** @var Attribute $attribute */
                 $search = $attribute->getSearchValue($data);
                 if ($search) {
-                    $this->searchByAttribute($q, $attribute, $search, $strictSearch);
+                    $q->searchByAttribute($attribute, $search, $strictSearch);
                 }
             }
         });
     }
 
-    protected function searchByAttribute(Builder $q, Attribute $attribute, array $search, bool $strict = false): void
+    /**
+     * @param Builder<static> $q
+     */
+    public function scopeSearchByAttribute(Builder $q, Attribute $attribute, array $search, bool $strict = false): void
     {
         if (empty($search)) {
             return;
@@ -256,7 +274,7 @@ trait AttributeTrait
             // TODO later improve
             $q->whereHas($searchAttribute->relation, function ($q) use ($search, $searchAttribute, $strict, $searchBy) {
                 $method = $strict ? 'whereIn' : 'orWhereIn';
-                $q->$method($searchAttribute->relation.'.' . $searchBy, $search); // TODO id also get by configs
+                $q->$method($searchAttribute->relation.'.'.$searchBy, $search); // TODO id also get by configs
             });
 
             return;

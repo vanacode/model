@@ -15,7 +15,6 @@ abstract class Action
 {
     use BladeTrait;
 
-
     public string $id;
 
     public string $component;
@@ -134,8 +133,11 @@ abstract class Action
         if ($dynamicLabel = $this->getDynamicLabel()) {
             $parts[] = $dynamicLabel;
         }
-        if ($label = $this->options['label'] ?? '') {
-            $parts[] = __($label, $this->getLocaleReplacements());
+
+        if (!empty($this->options['label'])) {
+            $parts[] = $this->options['label'];
+        } elseif (!empty($this->options['label_key'])) {
+            $parts[] = __($this->options['label_key'], $this->getLocaleReplacements());
         }
 
         $parts = array_filter($parts);
@@ -143,14 +145,18 @@ abstract class Action
             return implode(' ', $parts);
         }
 
-        return $this->getActionLabel();
+        return $this->detectActionLabel();
     }
 
     protected function getTitle(): string
     {
-        $title = $this->options['title'] ?? '';
+        if (!empty($this->options['title'])) {
+            return $this->options['title'];
+        }
 
-        return $title ? __($title, $this->getLocaleReplacements()) : $this->getDefaultActionLabel();
+        $titleKey = $this->options['title_key'] ?? '';
+
+        return $titleKey ? __($titleKey, $this->getLocaleReplacements()) : $this->getDefaultActionLabel();
     }
 
     protected function getDynamicLabel(): ?string
@@ -158,7 +164,7 @@ abstract class Action
         return null;
     }
 
-    protected function getActionLabel(): string
+    protected function detectActionLabel(): string
     {
         return $this->getDefaultActionLabel();
     }
@@ -167,9 +173,9 @@ abstract class Action
     {
         $key = '';
         if ($this->subResource) {
-            $key .= VnStr::slugToSnake($this->subResource).'.';
+            $key = $this->subResource.'.';
         }
-        $key .= VnStr::slugToSnake($this->action);
+        $key .= $this->action;
 
         return Lang::actionResource($this->resource, $key);
     }
