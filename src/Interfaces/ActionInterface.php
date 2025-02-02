@@ -4,10 +4,8 @@ namespace Vanacode\Model\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
 use Vanacode\Model\Actions\ItemActionList;
-use Vanacode\Support\Interfaces\MethodMatchInterface;
 
 /**
- * @mixin MethodMatchInterface
  * @mixin MainKeyInterface
  * @mixin Model
  */
