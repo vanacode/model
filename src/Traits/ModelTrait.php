@@ -23,11 +23,6 @@ trait ModelTrait
         RouteScopeTrait,
         ShowableTrait;
 
-    public function selfRelationResourceAndKeys(): array
-    {
-        return [];
-    }
-
     /**
      * @return mixed|string
      */
