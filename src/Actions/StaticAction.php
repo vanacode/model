@@ -12,6 +12,11 @@ class StaticAction extends Action
         }
     }
 
+    protected function canDoAction(): bool
+    {
+        return $this->modelClass::canDoStaticAction($this->action);
+    }
+
     protected function getConfigOptions(string $action): array
     {
         return config('vn_model.static_actions.'.$action, []);

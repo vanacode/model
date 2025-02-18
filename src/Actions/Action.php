@@ -65,6 +65,8 @@ abstract class Action
 
     abstract protected function makeHtml(): string;
 
+    abstract protected function canDoAction(): bool;
+
     public static function getDefaultConfirmationTexts(): array
     {
         return [
@@ -92,11 +94,6 @@ abstract class Action
         $method = $this->httpMethod ?: 'get';
 
         return Str::before($this->href, '?') != URL::current() || strtoupper($method) != request()->getMethod();
-    }
-
-    protected function canDoAction(): bool
-    {
-        return true;
     }
 
     public function render(): string

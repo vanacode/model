@@ -34,6 +34,14 @@ trait ActionTrait
         return static::$staticActions;
     }
 
+    public static function canDoStaticAction(string $action): bool
+    {
+        $action = VnStr::forceSnake($action);
+        $canDoAction = sprintf('canDo%sStaticAction', Str::studly($action));
+
+        return method_exists(static::class, $canDoAction) ? static::$canDoAction() : true;
+    }
+
     public function skipTraitActions(): bool
     {
         return $this->skipTraitActions;
