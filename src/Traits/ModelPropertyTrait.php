@@ -2,18 +2,17 @@
 
 namespace Vanacode\Model\Traits;
 
-use Illuminate\Database\Eloquent\Model;
 use Vanacode\Model\Interfaces\ModelInterface;
 use Vanacode\Support\Traits\DynamicClassTrait;
 
 /**
  * @mixin DynamicClassTrait
+ *
+ * @property ModelInterface $model
  */
 trait ModelPropertyTrait
 {
-    protected ModelInterface|Model $model;
-
-    public function setModel(ModelInterface|Model $model): self
+    public function setModel(ModelInterface $model): self
     {
         $this->model = $model;
 
@@ -26,14 +25,14 @@ trait ModelPropertyTrait
      * if $model argument is not null
      * otherwise make model instance dynamically based caller sub folders first match and set it
      */
-    public function setModelBy(ModelInterface|Model|null $model, array $data = []): self
+    public function setModelBy(?ModelInterface $model, array $data = []): self
     {
         $model = $model ?? $this->makeModel($data);
 
         return $model ? $this->setModel($model) : $this;
     }
 
-    public function getModel(): ModelInterface|Model
+    public function getModel(): ModelInterface
     {
         return $this->model;
     }
@@ -44,7 +43,7 @@ trait ModelPropertyTrait
      * return property $model if is set,
      * otherwise make model instance dynamically based caller sub folders first match and return it
      */
-    public function getModelBy(array $data = []): ModelInterface|Model|null
+    public function getModelBy(array $data = []): ?ModelInterface
     {
         return $this->isSetModel() ? $this->getModel() : $this->makeModel($data);
     }
@@ -57,7 +56,7 @@ trait ModelPropertyTrait
     /**
      * make model instance dynamically based caller sub folders first match
      */
-    public function makeModel(array $data = []): ModelInterface|Model|null
+    public function makeModel(array $data = []): ?ModelInterface
     {
         return $this->makeClassDynamically('Models', '', $data);
     }

@@ -21,6 +21,7 @@ trait ModelTrait
         RelationshipsTrait,
         ResourceTrait,
         RouteScopeTrait,
+        ScopeByArrayTrait,
         ShowableTrait;
 
     /**

@@ -131,9 +131,9 @@ abstract class Action
             $parts[] = $dynamicLabel;
         }
 
-        if (!empty($this->options['label'])) {
+        if (! empty($this->options['label'])) {
             $parts[] = $this->options['label'];
-        } elseif (!empty($this->options['label_key'])) {
+        } elseif (! empty($this->options['label_key'])) {
             $parts[] = __($this->options['label_key'], $this->getLocaleReplacements());
         }
 
@@ -147,7 +147,7 @@ abstract class Action
 
     protected function getTitle(): string
     {
-        if (!empty($this->options['title'])) {
+        if (! empty($this->options['title'])) {
             return $this->options['title'];
         }
 

@@ -6,7 +6,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Str;
 use Vanacode\Model\Interfaces\ModelInterface;
-use Vanacode\Model\Model;
 use Vanacode\Resource\RequestHelper;
 
 /**
@@ -132,7 +131,7 @@ class Attribute
         }
     }
 
-    public function setItem(Model $model)
+    public function setItem(ModelInterface $model)
     {
         // TODO decide is usefull or not
     }
@@ -158,15 +157,16 @@ class Attribute
 
     protected function getAttributeLabel(array $details): string
     {
-        if (!empty($details['label'])) {
+        if (! empty($details['label'])) {
             return $details['label'];
         }
+
         return ! empty($details['label_key']) ? __($details['label_key']) : Lang::attribute($this->name, $this->resource);
     }
 
     protected function getWithCountAttributeLabel(array $details): string
     {
-        if (!empty($details['label'])) {
+        if (! empty($details['label'])) {
             return $details['label'];
         }
 

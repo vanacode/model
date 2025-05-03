@@ -84,7 +84,8 @@ trait AttributeTrait
     }
 
     /**
-     * @param Builder<static> $q
+     * @param  Builder<static>  $q
+     *
      * @throws \Exception
      */
     public function scopeAttributeOptions(Builder $q, AttributeList $attributes, array $data = []): void
@@ -147,7 +148,7 @@ trait AttributeTrait
     }
 
     /**
-     * @param Builder<static> $q
+     * @param  Builder<static>  $q
      */
     public function scopeSimpleSearchByAttributes(Builder $q, AttributeList $attributes, array $search): void
     {
@@ -180,7 +181,7 @@ trait AttributeTrait
     }
 
     /**
-     * @param Builder<static> $q
+     * @param  Builder<static>  $q
      */
     public function scopeAdvancedSearchByAttributes(Builder $q, AttributeList $attributes, array $data, bool $advancedSearch): void
     {
@@ -219,7 +220,7 @@ trait AttributeTrait
     }
 
     /**
-     * @param Builder<static> $q
+     * @param  Builder<static>  $q
      */
     public function scopeSimpleSearchByAllAttributes(Builder $q, Collection $searchable, array $search): void
     {
@@ -231,7 +232,7 @@ trait AttributeTrait
     }
 
     /**
-     * @param Builder<static> $q
+     * @param  Builder<static>  $q
      */
     public function scopeAdvancedSearchByAllAttributes(Builder $q, Collection $searchAttributes, array $data): void
     {
@@ -248,7 +249,7 @@ trait AttributeTrait
     }
 
     /**
-     * @param Builder<static> $q
+     * @param  Builder<static>  $q
      */
     public function scopeSearchByAttribute(Builder $q, Attribute $attribute, array $search, bool $strict = false): void
     {
